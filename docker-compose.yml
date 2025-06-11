@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tinyurl-postgres
+    environment:
+      POSTGRES_DB: tinyurl
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tinyurl-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbadmin -d tinyurl"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tinyurl-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - tinyurl-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  couchdb:
+    image: couchdb:3
+    container_name: tinyurl-couchdb
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: couchdb123
+    ports:
+      - "5984:5984"
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+    networks:
+      - tinyurl-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: tinyurl-app
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: tinyurl
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: postgres123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      COUCHDB_HOST: couchdb
+      COUCHDB_PORT: 5984
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: couchdb123
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      couchdb:
+        condition: service_healthy
+    networks:
+      - tinyurl-network
+    volumes:
+      - ./app:/usr/src/app
+      - /usr/src/app/node_modules
+
+  nginx:
+    image: nginx:alpine
+    container_name: tinyurl-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - tinyurl-network
+
+networks:
+  tinyurl-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  couchdb_data:
