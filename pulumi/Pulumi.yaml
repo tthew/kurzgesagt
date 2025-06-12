@@ -1,0 +1,9 @@
+name: tinyurl
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: TinyURL infrastructure on AWS
+config:
+  aws:region:
+    value: eu-west-1	

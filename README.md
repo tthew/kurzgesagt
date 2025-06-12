@@ -1,45 +1,46 @@
-# TinyURL Infrastructure
+# TinyURL Service
 
-This Terraform project sets up a complete infrastructure for a TinyURL service with:
-- CouchDB (NoSQL database)
-- PostgreSQL (Relational database)
-- Redis (Caching layer)
-- Node.js Application Servers (Auto-scaling group)
-- Application Load Balancer
+A complete URL shortening service with infrastructure as code and local development support.
 
-## Prerequisites
+## Features
 
-1. Install Terraform (>= 1.0)
-2. Configure AWS credentials
-3. Have an AWS account with appropriate permissions
+- **URL Shortening**: Create short URLs with custom codes
+- **Analytics**: Track clicks and usage statistics
+- **Multi-Database**: PostgreSQL, Redis, and CouchDB integration
+- **Auto-Scaling**: Horizontal scaling with load balancing
+- **Infrastructure as Code**: Pulumi for AWS deployment
+- **Local Development**: Docker Compose for local testing
 
-## Usage
+## Quick Start - Local Development
 
-1. Clone this repository
-2. Copy `terraform.tfvars.example` to `terraform.tfvars`:
-   ```bash
-   cp terraform.tfvars.example terraform.tfvars
-   ```
+Run the entire stack locally with Docker:
 
-3. Edit `terraform.tfvars` and set your PostgreSQL password:
-   ```hcl
-   postgres_password = "your-secure-password-here"
-   ```
+```bash
+docker-compose up -d
+```
 
-4. Initialize Terraform:
-   ```bash
-   terraform init
-   ```
+Access the API at http://localhost:3333 and create short URLs:
 
-5. Review the plan:
-   ```bash
-   terraform plan
-   ```
+```bash
+curl -X POST http://localhost:3333/api/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.example.com"}'
+```
 
-6. Apply the configuration:
-   ```bash
-   terraform apply
-   ```
+See [README-DOCKER.md](README-DOCKER.md) for detailed local development instructions.
+
+## AWS Deployment with Pulumi
+
+Deploy to AWS using Pulumi infrastructure as code:
+
+```bash
+cd pulumi
+npm install
+pulumi config set --secret tinyurl:postgresPassword your-password
+pulumi up
+```
+
+See [pulumi/README.md](pulumi/README.md) for detailed deployment instructions.
 
 ## Architecture
 
@@ -60,27 +61,34 @@ After applying, you'll get:
 - `redis_endpoint`: Redis connection endpoint
 - `couchdb_endpoint`: CouchDB connection endpoint
 
-## Customization
+## Project Structure
 
-You can customize the deployment by modifying variables in `terraform.tfvars`:
-- Instance types for each service
-- Auto-scaling parameters
-- VPC CIDR blocks
-- AWS region
-
-## Security Notes
-
-- All databases are in private subnets
-- Security groups restrict access appropriately
-- Passwords are stored in AWS Systems Manager Parameter Store
-- Enable encryption at rest for all data stores
-
-## Clean Up
-
-To destroy all resources:
-```bash
-terraform destroy
 ```
+├── app/                    # Node.js application code
+├── docker-compose.yml      # Local development stack
+├── nginx/                  # Load balancer configuration
+├── pulumi/                 # AWS infrastructure as code
+│   ├── components/         # Reusable Pulumi components
+│   └── README.md          # Deployment instructions
+├── README-DOCKER.md       # Local development guide
+└── README.md              # This file
+```
+
+## API Endpoints
+
+- `POST /api/shorten` - Create a short URL
+- `GET /:shortCode` - Redirect to original URL
+- `GET /api/urls` - List all URLs
+- `GET /health` - Health check endpoint
+
+## Technology Stack
+
+- **Backend**: Node.js with Express
+- **Databases**: PostgreSQL, Redis, CouchDB
+- **Infrastructure**: Pulumi (TypeScript)
+- **Containerization**: Docker & Docker Compose
+- **Load Balancing**: Nginx (local), AWS ALB (production)
+- **Cloud**: AWS (EC2, RDS, ElastiCache)
 
 ## Cost Estimation
 

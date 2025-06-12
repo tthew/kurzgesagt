@@ -1,0 +1,4 @@
+config:
+  tinyurl:postgresPassword:
+    secure: AAABAOuMpBLUJjhkd/aDXeJX3yhhlEJr5nQDH29sZcq2DGmO5DjGR4PQOhDORPZ4ZA==
+  tinyurl:environment: dev

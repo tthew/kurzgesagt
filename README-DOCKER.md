@@ -33,14 +33,14 @@ This guide explains how to run the TinyURL service locally using Docker Compose.
    docker-compose ps
 
    # Check API health
-   curl http://localhost/health
+   curl http://localhost:3333/health
    ```
 
 ## API Endpoints
 
 ### Create a short URL
 ```bash
-curl -X POST http://localhost/api/shorten \
+curl -X POST http://localhost:3333/api/shorten \
   -H "Content-Type: application/json" \
   -d '{"url": "https://www.example.com"}'
 ```
@@ -48,17 +48,17 @@ curl -X POST http://localhost/api/shorten \
 ### Use a short URL
 ```bash
 # Visit in browser or use curl
-curl -L http://localhost/abc123
+curl -L http://localhost:3333/abc123
 ```
 
 ### Get URL statistics
 ```bash
-curl http://localhost/api/stats/abc123
+curl http://localhost:3333/api/stats/abc123
 ```
 
 ### List all URLs
 ```bash
-curl http://localhost/api/urls
+curl http://localhost:3333/api/urls
 ```
 
 ## Database Access

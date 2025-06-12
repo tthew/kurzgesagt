@@ -1,0 +1,18 @@
+config:
+  tinyurl:projectName: tinyurl
+  tinyurl:environment: prod
+  tinyurl:vpcCidr: 10.1.0.0/16
+  tinyurl:availabilityZones:
+    - euw1-az1
+    - euw1-az2	
+    - euw1-az3
+  tinyurl:couchdbInstanceType: t3.large
+  tinyurl:postgresInstanceClass: db.t3.small
+  tinyurl:postgresStorageSize: "100"
+  tinyurl:postgresDbName: tinyurl
+  tinyurl:postgresUsername: dbadmin
+  tinyurl:redisNodeType: cache.t3.small
+  tinyurl:appInstanceType: t3.medium
+  tinyurl:appDesiredCapacity: "3"
+  tinyurl:appMinSize: "2"
+  tinyurl:appMaxSize: "6"
