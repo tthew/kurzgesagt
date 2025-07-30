@@ -1,3 +1,6 @@
+# npm
+node_nodules/
+
 # Terraform files
 *.tfstate
 *.tfstate.*
